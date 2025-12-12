@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 # Sesuaikan dengan setingan XAMPP / MySQL kamu
 # user: root, password: (kosong), host: 127.0.0.1, port: 3306
-DATABASE_URL = "mysql+pymysql://root:@127.0.0.1:3306/lost-and-found-db"
+DATABASE_URL = "mysql+pymysql://dev_remote:password123@100.92.242.89/lost-and-found"
 
 engine = create_engine(
     DATABASE_URL,
