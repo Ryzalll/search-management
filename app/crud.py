@@ -36,20 +36,27 @@ def search_reports(
 
     query = query.order_by(models.Report.created_at.desc())
 
+    # PENTING: .all() akan mengembalikan [] kalau tidak ada data, BUKAN error
     return query.limit(limit).all()
+
+# app/crud.py
+
+def find_report_by_id(db: Session, report_id: int) -> Optional[models.Report]:
+    return db.query(models.Report).filter(models.Report.id == report_id).first()
 
 
 def find_matches_for_report(
     db: Session,
     report_id: int,
     limit: int = 10,
-) -> List[models.Report]:
+) -> tuple[Optional[models.Report], list[models.Report]]:
     # 1. Ambil report target
-    target = db.query(models.Report).filter(models.Report.id == report_id).first()
-    if not target:
-        return []
+    target = find_report_by_id(db, report_id)
+    if target is None:
+        # return (target=None, matches=[])
+        return None, []
 
-    # 2. Cari report lain dengan lokasi dan tipe yang sama
+    # 2. Cari report lain dengan lokasi & tipe sama
     q = (
         db.query(models.Report)
         .filter(models.Report.id != target.id)
@@ -60,4 +67,6 @@ def find_matches_for_report(
         q = q.filter(models.Report.location == target.location)
 
     q = q.order_by(models.Report.created_at.desc())
-    return q.limit(limit).all()
+    matches = q.limit(limit).all()
+
+    return target, matches
